@@ -147,7 +147,7 @@ In the cell below, use the `json` module to load the data from `world_cup_file` 
 
 ```python
 # Replace None with appropriate code
-world_cup_data = None
+world_cup_data = json.load(world_cup_file)
 
 # Close the file now that we're done reading from it
 world_cup_file.close()
