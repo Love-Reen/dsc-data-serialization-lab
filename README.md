@@ -175,7 +175,7 @@ Now use the `csv` module to load the data from `population_file` into a list of 
 
 ```python
 # Replace None with appropriate code
-population_data = None
+population_data = list(csv.DictReader(population_file))
 
 # Close the file now that we're done reading from it
 population_file.close()
@@ -321,10 +321,11 @@ matches = []
 # "round" is a built-in function in Python so we use "round_" instead
 for round_ in rounds:
     # Extract the list of matches for this round
-    round_matches = None
+    round_matches = round_["matches"] # Access the 'matches' key from each round_ dictionary
     # Add them to the overall list of matches
-    None
+    matches.extend(round_matches) # Use .extend() to add all elements from round_matches
 
+# Display the first match to verify (as per the lab's original structure)
 matches[0]
 ```
 
@@ -364,9 +365,9 @@ teams_set = set()
 
 for match in matches:
     # Add team1 name value to teams_set
-    None
+    teams_set.add(match["team1"]["name"]) # Access 'name' within 'team1'
     # Add team2 name value to teams_set
-    None
+    teams_set.add(match["team2"]["name"]) # Access 'name' within 'team2'
 
 teams = sorted(list(teams_set))
 print(teams)
@@ -440,7 +441,7 @@ Initially `combined_data` will look something like this:
 # Replace None with appropriate code
 
 # Create the variable combined_data as described above
-None
+combined_data = {team: {'wins': 0} for team in teams}
 ```
 
 Check that the `assert`s pass.
@@ -505,7 +506,15 @@ def find_winner(match):
     Given a dictionary containing information about a match,
     return the name of the winner (or None in the case of a tie)
     """
-    None
+    score1 = match['score1']
+    score2 = match['score2']
+
+    if score1 > score2:
+        return match['team1']['name']
+    elif score2 > score1:
+        return match['team2']['name']
+    else: # This covers the case where score1 == score2 (a tie)
+        return None
 ```
 
 
@@ -524,15 +533,13 @@ Now that we have this helper function, loop over every match in `matches`, find 
 
 for match in matches:
     # Get the name of the winner
-    winner = None
-    # Only proceed to the next step if there was
-    # a winner
+    winner = find_winner(match) # Call your previously defined function
+    # Only proceed to the next step if there was a winner
     if winner:
         # Add 1 to the associated count of wins
-        None
+        combined_data[winner]['wins'] += 1 # Access the winner's dictionary and increment 'wins'
 
-# Visually inspect the output to ensure the wins are
-# different for different countries
+# Visually inspect the output to ensure the wins are different for different countries
 combined_data
 ```
 
@@ -666,7 +673,8 @@ population_data_filtered = []
 
 for record in population_data:
     # Add record to population_data_filtered if relevant
-    None
+    if record['Country Name'] in teams and record['Year'] == "2018":
+        population_data_filtered.append(record)
 
 len(population_data_filtered)  # 27
 ```
@@ -735,15 +743,20 @@ population_data_filtered = []
 
 for record in population_data:
     # Get normalized country name
-    None
+    normalized_country_name = normalize_location(record['Country Name'])
+    
     # Add record to population_data_filtered if relevant
-    if None:
+    if normalized_country_name in teams and record['Year'] == "2018":
         # Replace the country name in the record
-        None
+        # Create a copy of the record to avoid modifying the original population_data
+        # This is a good practice, though not strictly required if population_data isn't reused elsewhere
+        record_copy = record.copy() 
+        record_copy['Country Name'] = normalized_country_name
+        
         # Append to list
-        None
+        population_data_filtered.append(record_copy)
 
-len(population_data_filtered)  # 32
+len(population_data_filtered) # 32
 ```
 
 Great, now we should have 32 records instead of 27.
@@ -767,7 +780,7 @@ In the cell below, loop over `population_data_filtered` and convert the data typ
 # Replace None with appropriate code
 for record in population_data_filtered:
     # Convert the population value from str to int
-    None
+    record['Value'] = int(record['Value'])
 
 # Look at the last record to make sure the population
 # value is an int
@@ -808,11 +821,11 @@ In the cell below, loop over `population_data_filtered` and add information abou
 # Replace None with appropriate code
 for record in population_data_filtered:
     # Extract the country name from the record
-    country = None
+    country = record['Country Name']
     # Extract the population value from the record
-    population = None
+    population = record['Value']
     # Add this information to combined_data
-    None
+    combined_data[country]['population'] = population
 
 # Look combined_data
 combined_data
@@ -890,7 +903,9 @@ In the cell below, interpret this number. What direction is this correlation? Is
 ```python
 # Replace None with appropriate code
 """
-None
+This correlation coefficient of approximately 0.076 indicates a very weak positive correlation. 
+The positive direction suggests that as a country's population increases, its number of wins in the World Cup tends to slightly increase, but the relationship is extremely weak. 
+This means population is not a strong predictor of World Cup performance based on this dataset.
 """
 ```
 
@@ -938,7 +953,10 @@ Interpret this plot in the cell below. Does this align with the findings from th
 ```python
 # Replace None with appropriate text
 """
-None
+Looking at this scatter plot, it pretty much shows what the correlation number told us. 
+There isn't a clear pattern where bigger populations always mean more wins in the World Cup. 
+You can see countries with really large populations, like Brazil, only having a few wins, while other countries with smaller populations, like Belgium, did much better. 
+This means a country's population size doesnt seem to be a strong factor in how many games they win in the World Cup.
 """
 ```
 
@@ -957,7 +975,8 @@ In the cell below, write down your thoughts on these questions:
 ```python
 # Replace None with appropriate text
 """
-None
+I think we see this weak result because soccer success probably depends more on things like how popular the sport is in a country, how good their training programs are, how much money is invested in the sport, and maybe even just luck on the day. A big population means more people, but it doesnt automatically mean more great soccer players or a better team.
+Next, I would research how much money countries invest in their youth soccer programs, how many registered soccer players they have, or maybe even look at their national soccer league's strength. I'd also check if climate or culture plays a role.
 """
 ```
 
